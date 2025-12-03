@@ -1,10 +1,10 @@
 <!-- Header -->
 <div class="flex items-center justify-between p-6 border-b border-[#333]">
     <div class="flex space-x-8 text-xs uppercase tracking-widest text-[#666]">
-        <span class="text-white hidden md:inline">Your Bag [0]</span>
+        <span class="text-white hidden md:inline">Your Bag [{{ cart|length }}]</span>
     </div>
     <div class="flex items-center justify-between w-full md:w-auto">
-        <span class="text-white text-lg md:hidden">YOUR BAG [0]</span>
+        <span class="text-white text-lg md:hidden">YOUR BAG [{{ cart|length }}]</span>
         <button @click="open = false"
             class="flex items-center text-xs text-white hover:text-gray-400 uppercase tracking-wider">
             Close <i data-lucide="x" class="w-4 h-4 ml-1"></i>
@@ -14,16 +14,73 @@
 
 <!-- Items List -->
 <div class="flex-1 overflow-y-auto p-6 space-y-8">
+    {% if cart|length > 0 %}
+    {% for item in cart %}
+    {% with product=item.product %}
+    <div class="flex gap-4">
+        <div class="w-20 aspect-[3/4] bg-[#222] flex-shrink-0">
+            {% if product.images.first %}
+            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+            {% else %}
+            <div class="w-full h-full flex items-center justify-center text-[#666] text-xs">No Image</div>
+            {% endif %}
+        </div>
+        <div class="flex-1 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start">
+                    <h3 class="text-sm font-medium uppercase text-white">{{ product.name }}</h3>
+                    <span class="text-sm text-white">${{ item.total_price }}</span>
+                </div>
+                <p class="text-[10px] text-[#999] uppercase mt-1">{{ product.category.name }}</p>
+                {% if product.color %}
+                <p class="text-[10px] text-[#999] uppercase mt-1">Color: {{ product.color }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex justify-between items-end">
+                <div class="flex items-center border border-[#333]">
+                    <button
+                        class="px-2 py-1 {% if item.quantity <= 1 %}text-[#666] cursor-not-allowed{% else %}text-white hover:bg-[#333] transition-colors{% endif %}"
+                        hx-post="{% url 'cart:cart_update' product.id %}"
+                        hx-vals='{"quantity": {{ item.quantity|add:"-1" }}}' hx-target="#cart-drawer-content"
+                        hx-swap="innerHTML" {% if item.quantity <= 1 %}disabled{% endif %}>
+                        -
+                    </button>
+                    <span class="px-2 text-xs text-white">{{ item.quantity }}</span>
+                    <button class="px-2 py-1 text-white hover:bg-[#333] transition-colors"
+                        hx-post="{% url 'cart:cart_update' product.id %}"
+                        hx-vals='{"quantity": {{ item.quantity|add:"1" }}}' hx-target="#cart-drawer-content"
+                        hx-swap="innerHTML">
+                        +
+                    </button>
+                </div>
+                <button class="text-[10px] text-[#666] uppercase underline hover:text-white"
+                    hx-post="{% url 'cart:cart_remove' product.id %}" hx-target="#cart-drawer-content"
+                    hx-swap="innerHTML">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+    {% else %}
     <div class="h-full flex flex-col items-center justify-center text-[#666]">
         <p class="uppercase tracking-widest text-sm">Your bag is empty</p>
+        <a href="{% url 'catalog:product_list' %}" @click="open = false" hx-get="{% url 'catalog:product_list' %}"
+            hx-target="#main-content" hx-push-url="true" class="mt-4 text-xs underline hover:text-white cursor-pointer">
+            Start Shopping
+        </a>
     </div>
+    {% endif %}
 </div>
 
 <!-- Footer -->
+{% if cart|length > 0 %}
 <div class="p-6 border-t border-[#333] bg-[#1a1a1a]">
     <div class="flex justify-between items-center mb-2">
         <span class="text-xs uppercase tracking-widest text-white">Subtotal:</span>
-        <span class="text-sm font-medium text-white">$0.00</span>
+        <span class="text-sm font-medium text-white">${{ cart.get_total_price }}</span>
     </div>
     <p class="text-[10px] text-[#666] mb-6">Taxes and shipping calculated at checkout</p>
     <button
@@ -31,3 +88,8 @@
         Checkout
     </button>
 </div>
+{% endif %}
+
+<script>
+    lucide.createIcons();
+</script>

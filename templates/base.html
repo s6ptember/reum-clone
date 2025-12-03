@@ -67,7 +67,8 @@
                 <button @click="$dispatch('open-cart')" class="flex items-center space-x-1 hover:text-gray-400">
                     <span class="hidden md:inline">BAG</span>
                     <span class="md:hidden"><i data-lucide="shopping-bag" class="w-4 h-4"></i></span>
-                    <span id="cart-count-wrapper" class="ml-1 hidden">(<span id="cart-count">0</span>)</span>
+                    <span id="cart-count-wrapper" class="ml-1 {% if not cart|length %}hidden{% endif %}">(<span
+                            id="cart-count">{{ cart|length }}</span>)</span>
                 </button>
             </div>
         </div>
@@ -181,7 +182,7 @@
         <div x-show="open" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
             x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="translate-x-full"
+            x-transition:leave-end="translate-x-full" id="cart-drawer-content"
             class="relative w-full max-w-md h-full bg-[#1a1a1a] border-l border-[#333] flex flex-col shadow-2xl">
             {% include "cart/partials/cart_drawer.html" %}
         </div>
@@ -194,6 +195,31 @@
         lucide.createIcons();
         document.body.addEventListener('htmx:afterSwap', function (evt) {
             lucide.createIcons();
+        });
+
+        document.body.addEventListener('update-cart-count', function (evt) {
+            const count = evt.detail.value;
+            const cartCountElement = document.getElementById('cart-count');
+            const cartCountWrapper = document.getElementById('cart-count-wrapper');
+
+
+            // Update desktop count
+            if (cartCountElement) {
+                cartCountElement.innerText = count;
+                if (count > 0) {
+                    cartCountWrapper.classList.remove('hidden');
+                } else {
+                    cartCountWrapper.classList.add('hidden');
+                }
+            }
+
+            // Update mobile/drawer header count if needed (though drawer re-renders)
+            // We can also update the text in the drawer header if it wasn't part of the swap
+            // But since we swap the whole drawer content, it should be fine.
+        });
+
+        document.body.addEventListener('open-cart', function (evt) {
+            window.dispatchEvent(new CustomEvent('open-cart'));
         });
     </script>
 </body>
