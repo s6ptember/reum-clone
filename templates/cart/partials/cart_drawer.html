@@ -1,0 +1,33 @@
+<!-- Header -->
+<div class="flex items-center justify-between p-6 border-b border-[#333]">
+    <div class="flex space-x-8 text-xs uppercase tracking-widest text-[#666]">
+        <span class="text-white hidden md:inline">Your Bag [0]</span>
+    </div>
+    <div class="flex items-center justify-between w-full md:w-auto">
+        <span class="text-white text-lg md:hidden">YOUR BAG [0]</span>
+        <button @click="open = false"
+            class="flex items-center text-xs text-white hover:text-gray-400 uppercase tracking-wider">
+            Close <i data-lucide="x" class="w-4 h-4 ml-1"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Items List -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+    <div class="h-full flex flex-col items-center justify-center text-[#666]">
+        <p class="uppercase tracking-widest text-sm">Your bag is empty</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="p-6 border-t border-[#333] bg-[#1a1a1a]">
+    <div class="flex justify-between items-center mb-2">
+        <span class="text-xs uppercase tracking-widest text-white">Subtotal:</span>
+        <span class="text-sm font-medium text-white">$0.00</span>
+    </div>
+    <p class="text-[10px] text-[#666] mb-6">Taxes and shipping calculated at checkout</p>
+    <button
+        class="w-full bg-white text-black py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors">
+        Checkout
+    </button>
+</div>

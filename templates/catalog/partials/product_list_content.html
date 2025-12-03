@@ -1,0 +1,35 @@
+<!-- Product Grid View -->
+<div id="product-grid-view" class="w-full bg-[#333] grid grid-cols-2 md:grid-cols-4 gap-px border-b border-[#333]">
+    {% for product in products %}
+    <div class="group relative bg-[#1a1a1a] flex flex-col cursor-pointer overflow-hidden"
+        hx-get="{% url 'catalog:product_detail' product.slug %}" hx-target="#main-content" hx-push-url="true">
+        <!-- Image Container -->
+        <div class="aspect-[3/4] overflow-hidden bg-[#222]">
+            {% if product.images.first %}
+            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+            {% else %}
+            <div class="w-full h-full bg-[#222] flex items-center justify-center text-[#666]">No Image</div>
+            {% endif %}
+
+            {% if product.is_new %}
+            <span
+                class="absolute top-3 right-3 border border-[#666] text-white text-[10px] px-2 py-0.5 uppercase bg-[#1a1a1a]/80 backdrop-blur-sm">
+                New in
+            </span>
+            {% endif %}
+        </div>
+
+        <!-- Info Footer within the cell -->
+        <div
+            class="absolute bottom-0 left-0 right-0 p-3 flex justify-between items-end bg-gradient-to-t from-black/80 to-transparent">
+            <h3 class="text-[10px] md:text-[11px] font-bold text-white uppercase tracking-wide truncate max-w-[70%]">
+                {{ product.name }}
+            </h3>
+            <span class="text-[10px] md:text-[11px] text-white font-medium">
+                ${{ product.price }}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>

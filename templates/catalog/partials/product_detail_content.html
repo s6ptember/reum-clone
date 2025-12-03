@@ -1,0 +1,170 @@
+<!-- Product Detail View -->
+<div id="product-detail-view" class="bg-[#1a1a1a] text-white min-h-screen flex flex-col md:flex-row">
+    <!-- Left Column: Details (Sticky on Desktop) -->
+    <div
+        class="w-full md:w-1/3 md:h-[calc(100vh-theme(spacing.14))] md:sticky md:top-14 overflow-y-auto border-r border-[#333] flex flex-col">
+        <!-- Breadcrumbs -->
+        <div class="px-6 py-4 text-[10px] text-[#666] uppercase tracking-wide border-b border-[#333] bg-[#1a1a1a]">
+            <a href="{% url 'catalog:product_list' %}" hx-get="{% url 'catalog:product_list' %}"
+                hx-target="#main-content" hx-push-url="true" class="cursor-pointer hover:text-white">Catalog</a> /
+            <span class="cursor-pointer hover:text-white">{{ product.category.name }}</span> /
+            <span class="text-white">{{ product.name }}</span>
+        </div>
+
+        <div class="p-6 md:p-10 flex-1 flex flex-col">
+            <h1 class="text-2xl md:text-3xl font-medium tracking-tight mb-2 uppercase">{{ product.name }}</h1>
+            <p class="text-sm text-gray-300 mb-8">${{ product.price }}</p>
+
+            <div class="space-y-6 flex-1">
+                <div class="space-y-2">
+                    <h3 class="text-[10px] text-[#999] uppercase tracking-widest font-semibold mb-3">Details</h3>
+                    <ul class="text-[11px] text-[#ccc] space-y-1 list-disc pl-3 marker:text-[#666] leading-relaxed">
+                        {% if product.description %}<li>{{ product.description }}</li>{% endif %}
+                        {% if product.material %}<li>Material: {{ product.material }}</li>{% endif %}
+                        {% if product.shape %}<li>Shape: {{ product.shape }}</li>{% endif %}
+                        {% if product.color %}<li>Color: {{ product.color }}</li>{% endif %}
+                        {% if product.brand %}<li>Brand: {{ product.brand }}</li>{% endif %}
+                        {% if product.collection %}<li>Collection: {{ product.collection }}</li>{% endif %}
+                        {% if product.lens_type %}<li>Lens Type: {{ product.lens_type }}</li>{% endif %}
+                        {% if product.lens_features %}<li>Lens Features: {{ product.lens_features }}</li>{% endif %}
+                        {% if product.manufacturer %}<li>Manufacturer: {{ product.manufacturer }}</li>{% endif %}
+                        {% if product.country_of_origin %}<li>Country of Origin: {{ product.country_of_origin }}</li>{% endif %}
+                    </ul>
+
+                    {% if product.lens_width_mm %}
+                    <h3 class="text-[10px] text-[#999] uppercase tracking-widest font-semibold mb-3 mt-4">Dimensions
+                    </h3>
+                    <ul class="text-[11px] text-[#ccc] space-y-1 list-disc pl-3 marker:text-[#666] leading-relaxed">
+                        <li>Lens Width: {{ product.lens_width_mm }}mm</li>
+                        <li>Bridge Width: {{ product.bridge_width_mm }}mm</li>
+                        <li>Frame Front: {{ product.frame_width_mm }}mm</li>
+                        <li>Temple Length: {{ product.temple_length_mm }}mm</li>
+                        <li>Lens Height: {{ product.lens_height_mm }}mm</li>
+                    </ul>
+                    {% endif %}
+
+                    <button class="text-[10px] text-[#666] underline mt-2 hover:text-white">Size guide</button>
+                </div>
+            </div>
+
+            <!-- Selectors -->
+            <div class="mt-12 space-y-6">
+                <div>
+                    <span class="text-[10px] text-[#999] uppercase tracking-widest mr-2">Color:</span>
+                    <span class="text-[11px] text-white underline">{{ product.color|default:"Standard" }}</span>
+                    <div class="mt-2 w-6 h-6 border border-white bg-black"></div>
+                </div>
+
+                <div class="space-y-3 pt-4">
+                    <button
+                        class="w-full bg-white text-black py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors">
+                        Add to Bag
+                    </button>
+                    <button
+                        class="w-full border border-[#333] text-white py-3 text-xs font-bold uppercase tracking-widest hover:border-white transition-colors">
+                        Add to Wishlist
+                    </button>
+                    <div class="flex justify-between pt-2">
+                        <span class="text-[10px] text-[#666] underline cursor-pointer hover:text-white">Check in-store
+                            availability</span>
+                        <span class="text-[10px] text-[#666] underline cursor-pointer hover:text-white">Need
+                            help?</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Tabs Footer (Fake) -->
+        <div
+            class="grid grid-cols-3 border-t border-[#333] text-[10px] uppercase font-bold tracking-wider text-center bg-[#1a1a1a]">
+            <div class="py-4 bg-white text-black cursor-pointer">Details</div>
+            <div class="py-4 text-[#666] border-l border-[#333] hover:text-white cursor-pointer">Size & Fit</div>
+            <div class="py-4 text-[#666] border-l border-[#333] hover:text-white cursor-pointer">Shipping & Returns
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Images & Complete Look -->
+    <div class="w-full md:w-2/3 bg-[#222]">
+
+        <!-- Main Image Carousel Area -->
+        <div class="relative w-full" x-data="{
+            images: [
+                {% for image in product.images.all %}
+                '{{ image.image.url }}',
+                {% endfor %}
+            ],
+            activeImage: 0,
+            prev() {
+                this.activeImage = (this.activeImage - 1 + this.images.length) % this.images.length;
+            },
+            next() {
+                this.activeImage = (this.activeImage + 1) % this.images.length;
+            }
+        }">
+            <!-- Main large image -->
+            <div class="w-full aspect-[3/4] md:aspect-auto md:h-[80vh] relative bg-[#2a2a2a] overflow-hidden">
+                <template x-if="images.length > 0">
+                    <img :src="images[activeImage]" alt="{{ product.name }}"
+                        class="w-full h-full object-cover object-center transition-opacity duration-300" />
+                </template>
+                <template x-if="images.length === 0">
+                     <div class="w-full h-full flex items-center justify-center text-[#666]">No Image</div>
+                </template>
+
+                <!-- Navigation Arrows overlay -->
+                <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-[#333] hover:text-black transition-colors" x-show="images.length > 1">
+                    <i data-lucide="chevron-left" class="w-8 h-8 font-thin"></i>
+                </button>
+                <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-[#333] hover:text-black transition-colors" x-show="images.length > 1">
+                    <i data-lucide="chevron-right" class="w-8 h-8 font-thin"></i>
+                </button>
+            </div>
+
+            <!-- Thumbnails Overlay (Top Right) -->
+            <div class="absolute top-0 right-0 p-4 hidden md:flex space-x-2">
+                <template x-for="(image, index) in images" :key="index">
+                    <div @click="activeImage = index"
+                         class="w-20 aspect-[3/4] bg-[#111] border border-transparent cursor-pointer transition-all duration-200"
+                         :class="activeImage === index ? 'border-white opacity-100' : 'opacity-80 hover:opacity-100'">
+                        <img :src="image" alt="view" class="w-full h-full object-cover" />
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Related Products Section -->
+        <div class="border-t border-[#333] bg-[#1a1a1a]">
+            <div class="p-6 md:p-8">
+                <h3 class="text-lg md:text-xl font-medium uppercase mb-6">Related Products</h3>
+            </div>
+            <div class="grid grid-cols-2 border-t border-[#333] bg-[#333] gap-px">
+                {% for product in related_products %}
+                <div class="group relative bg-[#1a1a1a] flex flex-col cursor-pointer overflow-hidden"
+                    hx-get="{% url 'catalog:product_detail' product.slug %}" hx-target="#main-content" hx-push-url="true">
+                    <!-- Image Container -->
+                    <div class="aspect-[3/4] overflow-hidden bg-[#222]">
+                        {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+                        {% else %}
+                        <div class="w-full h-full bg-[#222] flex items-center justify-center text-[#666]">No Image</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Info Footer within the cell -->
+                    <div
+                        class="absolute bottom-0 left-0 right-0 p-3 flex justify-between items-end bg-gradient-to-t from-black/80 to-transparent">
+                        <h3 class="text-[10px] md:text-[11px] font-bold text-white uppercase tracking-wide truncate max-w-[70%]">
+                            {{ product.name }}
+                        </h3>
+                        <span class="text-[10px] md:text-[11px] text-white font-medium">
+                            ${{ product.price }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

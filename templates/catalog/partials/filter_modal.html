@@ -1,0 +1,98 @@
+<!-- Filter Modal -->
+<div x-data="{ open: false }" @open-filter-modal.window="open = true" @close-filter-modal.window="open = false"
+    x-show="open" style="display: none;" class="fixed inset-0 z-50 flex justify-end">
+
+    <!-- Backdrop -->
+    <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="open = false"></div>
+
+    <!-- Drawer -->
+    <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+        class="relative w-full max-w-md h-full bg-[#1a1a1a] border-l border-[#333] flex flex-col shadow-2xl p-6 overflow-y-auto">
+
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-medium uppercase tracking-wide">Filter & Sort</h2>
+            <button @click="open = false" class="text-[#666] hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <form hx-get="{% url 'catalog:product_list' %}" hx-target="#main-content" hx-push-url="true"
+            @submit.prevent="$el.requestSubmit(); open = false" class="space-y-6">
+
+            <!-- Preserve current category if any -->
+            {% if request.GET.category %}
+            <input type="hidden" name="category" value="{{ request.GET.category }}">
+            {% endif %}
+
+            <!-- Dimensions -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[#999]">Dimensions (mm)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] mb-1">Lens Width</label>
+                        <input type="number" step="0.1" name="lens_width_mm"
+                            class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                            placeholder="e.g. 50">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] mb-1">Bridge Width</label>
+                        <input type="number" step="0.1" name="bridge_width_mm"
+                            class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                            placeholder="e.g. 20">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] mb-1">Frame Width</label>
+                        <input type="number" step="0.1" name="frame_width_mm"
+                            class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                            placeholder="e.g. 140">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] mb-1">Temple Length</label>
+                        <input type="number" step="0.1" name="temple_length_mm"
+                            class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                            placeholder="e.g. 145">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Characteristics -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[#999]">Characteristics</h3>
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] mb-1">Shape</label>
+                    <input type="text" name="shape"
+                        class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                        placeholder="e.g. Round">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] mb-1">Color</label>
+                    <input type="text" name="color"
+                        class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                        placeholder="e.g. Black">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] mb-1">Material</label>
+                    <input type="text" name="material"
+                        class="w-full bg-[#333] border-none text-white text-sm p-2 focus:ring-1 focus:ring-white"
+                        placeholder="e.g. Acetate">
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-[#333]">
+                <button type="submit"
+                    class="w-full bg-white text-black py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors">
+                    Apply Filters
+                </button>
+                <button type="button" @click="open = false"
+                    class="w-full mt-3 border border-[#333] text-white py-3 text-xs font-bold uppercase tracking-widest hover:border-white transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
