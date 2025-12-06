@@ -83,7 +83,7 @@
         <span class="text-sm font-medium text-white">${{ cart.get_total_price }}</span>
     </div>
     <p class="text-[10px] text-[#666] mb-6">Taxes and shipping calculated at checkout</p>
-    <button
+    <button hx-get="{% url 'orders:order_create' %}" hx-target="#main-content" hx-push-url="true" @click="open = false"
         class="w-full bg-white text-black py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors">
         Checkout
     </button>

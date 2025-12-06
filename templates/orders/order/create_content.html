@@ -1,0 +1,161 @@
+{% load widget_tweaks %}
+
+<div class="max-w-4xl mx-auto px-4 py-12"
+     x-data="{
+         firstName: '',
+         lastName: '',
+         email: '',
+         phone: '',
+         address: '',
+         postalCode: '',
+         city: '',
+         country: '',
+         
+         get isValid() {
+             return this.firstName.trim() !== '' &&
+                    this.lastName.trim() !== '' &&
+                    this.email.trim() !== '' &&
+                    this.phone.trim() !== '' &&
+                    this.address.trim() !== '' &&
+                    this.postalCode.trim() !== '' &&
+                    this.city.trim() !== '' &&
+                    this.country.trim() !== '';
+         }
+     }">
+
+    <div class="mb-12 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold uppercase tracking-tighter mb-4">Checkout</h1>
+        <p class="text-[#999] text-sm uppercase tracking-wider">Complete your order</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <!-- Order Summary -->
+        <div class="order-2 md:order-1">
+            <h2 class="text-xl font-medium uppercase tracking-wider mb-6 pb-4 border-b border-[#333]">
+                Order Summary
+            </h2>
+
+            <div class="space-y-4 mb-6">
+                {% for item in cart %}
+                    <div class="flex gap-4">
+                        <div class="w-16 aspect-[3/4] bg-[#222] flex-shrink-0">
+                            {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}"
+                                     alt="{{ item.product.name }}"
+                                     class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center text-[#666] text-xs">
+                                    No Image
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium uppercase">{{ item.product.name }}</h3>
+                            <p class="text-xs text-[#999] mt-1">Qty: {{ item.quantity }}</p>
+                            <p class="text-xs text-[#999]">Price: ${{ item.price }}</p>
+                        </div>
+
+                        <div class="text-sm font-medium">
+                            ${{ item.total_price }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-[#999]">Your cart is empty.</p>
+                {% endfor %}
+            </div>
+
+            <div class="border-t border-[#333] pt-4 space-y-2">
+                <div class="flex justify-between text-sm uppercase tracking-wider">
+                    <span>Subtotal</span>
+                    <span>${{ cart.get_total_price }}</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold uppercase tracking-wider pt-4">
+                    <span>Total</span>
+                    <span>${{ cart.get_total_price }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="order-1 md:order-2">
+            <h2 class="text-xl font-medium uppercase tracking-wider mb-6 pb-4 border-b border-[#333]">
+                Shipping Details
+            </h2>
+
+            <form method="post"
+                  hx-post="{% url 'orders:order_create' %}"
+                  hx-target="#main-content"
+                  class="space-y-6">
+
+                {% csrf_token %}
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">First Name</label>
+                        {% render_field form.first_name class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="firstName" placeholder="John" %}
+                        {{ form.first_name.errors }}
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">Last Name</label>
+                        {% render_field form.last_name class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="lastName" placeholder="Doe" %}
+                        {{ form.last_name.errors }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">Email</label>
+                    {% render_field form.email class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="email" placeholder="john@example.com" %}
+                    {{ form.email.errors }}
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">Phone</label>
+                    {% render_field form.phone class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="phone" placeholder="+1 234 567 890" %}
+                    {{ form.phone.errors }}
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">Address</label>
+                    {% render_field form.address class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="address" placeholder="123 Main St" %}
+                    {{ form.address.errors }}
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">City</label>
+                        {% render_field form.city class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="city" placeholder="New York" %}
+                        {{ form.city.errors }}
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">Postal Code</label>
+                        {% render_field form.postal_code class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="postalCode" placeholder="10001" %}
+                        {{ form.postal_code.errors }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-[#999] mb-2">Country</label>
+                    {% render_field form.country class="w-full bg-transparent border-b border-[#333] py-2 text-sm focus:outline-none focus:border-white transition-colors" x-model="country" placeholder="United States" %}
+                    {{ form.country.errors }}
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit"
+                            :disabled="!isValid"
+                            :class="{'opacity-50 cursor-not-allowed': !isValid, 'hover:bg-white hover:text-black': isValid}"
+                            class="w-full border border-white py-4 text-sm font-bold uppercase tracking-widest transition-all duration-300">
+                        Proceed to Payment
+                    </button>
+
+                    <p x-show="!isValid"
+                       class="text-center text-xs text-red-500 mt-2 uppercase tracking-wider">
+                        Please fill in all fields to proceed
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

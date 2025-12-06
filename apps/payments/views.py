@@ -76,6 +76,10 @@ def payment_webhook(request):
                     order.status = 'processing' # Or whatever status logic
                     order.save()
                     
+                    # Launch asynchronous task
+                    from apps.orders.tasks import send_payment_success_email
+                    send_payment_success_email.delay(order.id)
+                    
             except Order.DoesNotExist:
                 pass # Log error
             except Payment.DoesNotExist:
