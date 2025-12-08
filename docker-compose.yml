@@ -1,32 +1,67 @@
-version: '3.8'
-
 services:
+  web:
+    build: .
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    expose:
+      - 8000
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - internal_network
+
   db:
     image: postgres:15
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=eyeframe_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    networks:
+      - internal_network
 
-  web:
+  redis:
+    image: redis:7
+    networks:
+      - internal_network
+
+  celery:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: celery -A config worker -l info
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       - db
-    environment:
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=eyeframe_db
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
+      - redis
+    networks:
+      - internal_network
+
+  nginx:
+    image: nginx:1.25
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+      - /etc/letsencrypt/live/yourdomain.com/fullchain.pem:/etc/letsencrypt/live/yourdomain.com/fullchain.pem
+      - /etc/letsencrypt/live/yourdomain.com/privkey.pem:/etc/letsencrypt/live/yourdomain.com/privkey.pem
+    depends_on:
+      - web
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
+    driver: bridge
 
 volumes:
   postgres_data:
