@@ -26,3 +26,9 @@ urlpatterns = [
     path('orders/', include('apps.orders.urls', namespace='orders')),
     path('payments/', include('apps.payments.urls', namespace='payments')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]

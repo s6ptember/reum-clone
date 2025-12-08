@@ -62,6 +62,6 @@ class ProductDetailView(DetailView):
         product = self.object
         related_products = Product.objects.filter(
             category=product.category
-        ).exclude(id=product.id).order_by('?')[:2]
+        ).exclude(id=product.id).prefetch_related('images').order_by('?')[:2]
         context['related_products'] = related_products
         return context
