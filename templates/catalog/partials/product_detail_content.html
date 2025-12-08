@@ -1,9 +1,11 @@
 <!-- Product Detail View -->
+{% load cache %}
 <div id="product-detail-view" class="bg-[#1a1a1a] text-white min-h-screen flex flex-col md:flex-row">
     <!-- Left Column: Details (Sticky on Desktop) -->
     <div
         class="w-full md:w-1/3 md:h-[calc(100vh-theme(spacing.14))] md:sticky md:top-14 overflow-y-auto border-r border-[#333] flex flex-col">
         <!-- Breadcrumbs -->
+        {% cache 900 product_detail_info product.slug %}
         <div class="px-6 py-4 text-[10px] text-[#666] uppercase tracking-wide border-b border-[#333] bg-[#1a1a1a]">
             <a href="{% url 'catalog:product_list' %}" hx-get="{% url 'catalog:product_list' %}"
                 hx-target="#main-content" hx-push-url="true" class="cursor-pointer hover:text-white">Catalog</a> /
@@ -48,6 +50,7 @@
             </div>
 
             <!-- Selectors -->
+            {% endcache %}
             <div class="mt-12 space-y-6">
                 <div>
                     <span class="text-[10px] text-[#999] uppercase tracking-widest mr-2">Color:</span>
@@ -79,6 +82,7 @@
         </div>
 
         <!-- Details Tabs Footer (Fake) -->
+        {% cache 900 product_detail_footer product.slug %}
         <div
             class="grid grid-cols-3 border-t border-[#333] text-[10px] uppercase font-bold tracking-wider text-center bg-[#1a1a1a]">
             <div class="py-4 bg-white text-black cursor-pointer">Details</div>
@@ -87,8 +91,10 @@
             </div>
         </div>
     </div>
+    {% endcache %}
 
     <!-- Right Column: Images & Complete Look -->
+    {% cache 900 product_detail_images product.slug %}
     <div class="w-full md:w-2/3 bg-[#222]">
 
         <!-- Main Image Carousel Area -->
@@ -179,4 +185,5 @@
             </div>
         </div>
     </div>
+    {% endcache %}
 </div>

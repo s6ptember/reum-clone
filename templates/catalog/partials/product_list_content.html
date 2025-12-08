@@ -1,3 +1,5 @@
+{% load cache %}
+{% cache 900 product_grid request.GET.urlencode %}
 <!-- Product Grid View -->
 <div id="product-grid-view" class="w-full bg-[#333] grid grid-cols-2 md:grid-cols-4 gap-px border-b border-[#333]">
     {% for product in products %}
@@ -35,3 +37,4 @@
     </div>
     {% endfor %}
 </div>
+{% endcache %}
