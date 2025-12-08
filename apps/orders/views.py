@@ -77,5 +77,10 @@ def order_create(request):
     return render(request, 'orders/order/create.html', context)
 
 def order_detail(request, order_id):
+    session_order_id = request.session.get('order_id')
+    if str(session_order_id) != str(order_id):
+        from django.core.exceptions import PermissionDenied
+        raise PermissionDenied
+        
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/order/detail.html', {'order': order})
